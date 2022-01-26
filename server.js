@@ -5,11 +5,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { readFile, writeFile } from "fs/promises";
-import { v4 as uuid } from "uuid";
 import mongoose from "mongoose";
 import Todo from "./models/todo.model.js";
-
-import { connectDatabase, getTodoCollection } from "./utils/database.js";
 
 if (!process.env.MONGODB_ATLAS_URI) {
 	throw new Error("No MONGODB_ATLAS_URI dotenv variable");
