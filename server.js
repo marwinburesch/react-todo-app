@@ -6,6 +6,11 @@ dotenv.config();
 
 import { readFile, writeFile } from "fs/promises";
 import { v4 as uuid } from "uuid";
+import { connectDatabase } from "./utils/database.js";
+
+if (!process.env.MONGODB_ATLAS_URI) {
+	throw new Error("No MONGODB_ATLAS_URI dotenv variable");
+}
 
 const app = express();
 const port = 1337;
@@ -77,6 +82,8 @@ app.put("/api/todos", async (request, response) => {
 	// response.send();
 });
 
-app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`);
+connectDatabase(process.env.MONGODB_ATLAS_URI).then(() => {
+	app.listen(port, () => {
+		console.log(`Example app listening on port ${port}`);
+	});
 });
