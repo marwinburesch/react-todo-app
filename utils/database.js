@@ -11,6 +11,6 @@ export function getCollection(name) {
 	return client.db().collection(name);
 }
 
-export function getCredentialCollection() {
-	return getCollection("credentials");
+export function getTodoCollection() {
+	return getCollection("todos");
 }
