@@ -6,7 +6,7 @@ dotenv.config();
 
 import { readFile, writeFile } from "fs/promises";
 import { v4 as uuid } from "uuid";
-import { connectDatabase } from "./utils/database.js";
+import { connectDatabase, getTodoCollection } from "./utils/database.js";
 
 if (!process.env.MONGODB_ATLAS_URI) {
 	throw new Error("No MONGODB_ATLAS_URI dotenv variable");
@@ -31,8 +31,7 @@ app.get("/api/todos", async (request, response) => {
 });
 
 app.post("/api/todos", async (request, response) => {
-	const data = await readFile(DATABASE_URI, "utf8");
-	const json = JSON.parse(data);
+	const collection = getTodoCollection();
 
 	const todo = {
 		...request.body,
@@ -40,10 +39,9 @@ app.post("/api/todos", async (request, response) => {
 		id: uuid(),
 	};
 
-	json.todos.push(todo);
-	await writeFile(DATABASE_URI, JSON.stringify(json, null, 4));
-	response.status(201);
-	response.json(todo);
+	const insertedTodoID = await collection.insertOne(todo);
+
+	response.status(201).send(`Todo with ID: ${insertedTodoID.insertedId} created`);
 });
 
 app.delete("/api/todos", async (request, response) => {
