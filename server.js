@@ -6,6 +6,9 @@ dotenv.config();
 
 import { readFile, writeFile } from "fs/promises";
 import { v4 as uuid } from "uuid";
+import mongoose from "mongoose";
+import Todo from "./models/todo.model.js";
+
 import { connectDatabase, getTodoCollection } from "./utils/database.js";
 
 if (!process.env.MONGODB_ATLAS_URI) {
@@ -31,17 +34,14 @@ app.get("/api/todos", async (request, response) => {
 });
 
 app.post("/api/todos", async (request, response) => {
-	const collection = getTodoCollection();
-
-	const todo = {
+	const todo = new Todo({
 		...request.body,
 		isChecked: false,
-		id: uuid(),
-	};
+	});
 
-	const insertedTodoID = await collection.insertOne(todo);
+	const result = await todo.save();
 
-	response.status(201).send(`Todo with ID: ${insertedTodoID.insertedId} created`);
+	response.status(201).send(`Todo with ${result._id} created`);
 });
 
 app.delete("/api/todos", async (request, response) => {
@@ -80,7 +80,7 @@ app.put("/api/todos", async (request, response) => {
 	// response.send();
 });
 
-connectDatabase(process.env.MONGODB_ATLAS_URI).then(() => {
+mongoose.connect(process.env.MONGODB_ATLAS_URI).then(() => {
 	app.listen(port, () => {
 		console.log(`Example app listening on port ${port}`);
 	});
