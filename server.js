@@ -72,22 +72,24 @@ app.delete("/api/todos", async (request, response, next) => {
 	}
 });
 
-app.put("/api/todos", async (request, response, next) => {
+app.put("/api/todos/:id", async (request, response, next) => {
 	try {
-		const { id, update } = request.body;
-		const data = await readFile(DATABASE_URI, "utf-8");
-		const json = JSON.parse(data);
-		const index = json.todos.findIndex(user => user.id === id);
-		if (index < 0) {
-			response.status(400);
-			response.json({ error: { message: "This entry does not exist" } });
-			return;
-		}
-		json.todos[index] = { ...json.todos[index], ...update, id };
-		await writeFile(DATABASE_URI, JSON.stringify(json, null, 4));
+		const todoId = request.params.id;
+		const update = request.body;
+
+		const todo = await Todo.findByIdAndUpdate(
+			todoId,
+			update,
+			{ returnDocument: "after" },
+			() => {
+				response.status(400);
+				response.json({ error: { message: "This entry does not exist" } });
+			}
+		);
+
 		// Send a 200
 		response.status(200);
-		response.send(json.todos[index]);
+		response.json(todo);
 		// Or 204 (No Content)
 		// response.status(204);
 		// response.send();
