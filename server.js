@@ -26,9 +26,8 @@ const DATABASE_URI = "./database/database.json";
 
 app.get("/api/todos", async (request, response, next) => {
 	try {
-		const data = await readFile(DATABASE_URI, "utf8");
-		const json = JSON.parse(data);
-		response.json(json.todos);
+		const todos = await Todo.find({});
+		response.json(todos);
 	} catch (error_) {
 		next(error_);
 	}
