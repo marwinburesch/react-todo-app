@@ -5,7 +5,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { readFile, writeFile } from "fs/promises";
-import { connectDatabase, getTodoCollection } from "./utils/database.js";
+import mongoose from "mongoose";
+import Todo from "./models/todo.model.js";
 
 if (!process.env.MONGODB_URI) {
 	throw new Error("No MONGODB_URI available in dotenv");
@@ -35,18 +36,14 @@ app.get("/api/todos", async (request, response, next) => {
 
 app.post("/api/todos", async (request, response, next) => {
 	try {
-		const collection = getTodoCollection();
-
-		const todo = {
+		const todo = new Todo({
 			...request.body,
 			isChecked: false,
-		};
+		});
 
-		const mongoDbResponse = await collection.insertOne(todo);
+		const mongoDbResponse = await todo.save();
 
-		response
-			.status(201)
-			.send(`Insertion successful, document id:${mongoDbResponse.insertedId}`);
+		response.status(201).json(mongoDbResponse);
 	} catch (error_) {
 		next(error_);
 	}
@@ -100,7 +97,7 @@ app.put("/api/todos", async (request, response, next) => {
 	}
 });
 
-connectDatabase(process.env.MONGODB_URI).then(() => {
+mongoose.connect(process.env.MONGODB_URI).then(() => {
 	app.listen(port, () => {
 		console.log(`Server listening on port ${port} 🚀`);
 	});
