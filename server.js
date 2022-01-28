@@ -48,25 +48,20 @@ app.post("/api/todos", async (request, response, next) => {
 	}
 });
 
-app.delete("/api/todos", async (request, response, next) => {
-	const { id } = request.body;
+app.delete("/api/todos/:id", async (request, response, next) => {
 	try {
-		const data = await readFile(DATABASE_URI, "utf-8");
-		const json = JSON.parse(data);
-		const index = json.todos.findIndex(todo => todo.id === id);
-		if (index < 0) {
-			response.status(400);
+		const todoId = request.params.id;
+
+		const deletedTodo = await Todo.findByIdAndDelete(todoId);
+
+		if (!deletedTodo) {
+			response.status(404);
 			response.json({ error: { message: "This entry does not exist" } });
 			return;
 		}
-		json.todos.splice(index, 1);
-		await writeFile(DATABASE_URI, JSON.stringify(json, null, 4));
-		// Send a 204 (No Content)
-		response.status(204);
-		response.send();
-		// Or 200
-		// response.status(200);
-		// response.send("entry deleted");
+
+		response.status(200);
+		response.json(deletedTodo);
 	} catch (error_) {
 		next(error_);
 	}
