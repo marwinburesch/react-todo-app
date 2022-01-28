@@ -1,9 +1,6 @@
 import cors from "cors";
+import "dotenv/config";
 import express from "express";
-
-import dotenv from "dotenv";
-dotenv.config();
-
 import mongoose from "mongoose";
 import Todo from "./models/todo.model.js";
 
