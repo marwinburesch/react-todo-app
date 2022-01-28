@@ -79,6 +79,12 @@ app.put("/api/todos/:id", async (request, response, next) => {
 
 		const todo = await Todo.findByIdAndUpdate(todoId, update, { returnDocument: "after" });
 
+		if (!todo) {
+			response.status(404);
+			response.json({ error: { message: "This entry does not exist" } });
+			return;
+		}
+
 		response.status(200);
 		response.json(todo);
 	} catch (error_) {
