@@ -77,24 +77,15 @@ app.put("/api/todos/:id", async (request, response, next) => {
 		const todoId = request.params.id;
 		const update = request.body;
 
-		const todo = await Todo.findByIdAndUpdate(
-			todoId,
-			update,
-			{ returnDocument: "after" },
-			() => {
-				response.status(400);
-				response.json({ error: { message: "This entry does not exist" } });
-			}
-		);
+		const todo = await Todo.findByIdAndUpdate(todoId, update, { returnDocument: "after" });
 
-		// Send a 200
 		response.status(200);
 		response.json(todo);
-		// Or 204 (No Content)
-		// response.status(204);
-		// response.send();
 	} catch (error_) {
-		next(error_);
+		console.error(error_);
+
+		response.status(500);
+		response.json({ error: { message: "INTERNAL_SERVER_ERROR" } });
 	}
 });
 
