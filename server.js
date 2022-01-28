@@ -4,7 +4,6 @@ import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
 
-import { readFile, writeFile } from "fs/promises";
 import mongoose from "mongoose";
 import Todo from "./models/todo.model.js";
 
@@ -18,13 +17,11 @@ const port = 1337;
 app.use(express.json());
 app.use(cors());
 
-app.get("/", (request, response) => {
+app.get("/", (_request, response) => {
 	response.send("Hello World!");
 });
 
-const DATABASE_URI = "./database/database.json";
-
-app.get("/api/todos", async (request, response, next) => {
+app.get("/api/todos", async (_request, response, next) => {
 	try {
 		const todos = await Todo.find({});
 		response.json(todos);
@@ -67,7 +64,7 @@ app.delete("/api/todos/:id", async (request, response, next) => {
 	}
 });
 
-app.put("/api/todos/:id", async (request, response, next) => {
+app.put("/api/todos/:id", async (request, response, _next) => {
 	try {
 		const todoId = request.params.id;
 		const update = request.body;
